@@ -1,0 +1,56 @@
+body {
+    background-color: rgb(58, 58, 58);
+    font-family: Consolas;
+}
+
+canvas {
+    background: black;
+}
+
+h1 {
+    color: #00e640;
+}
+
+h3 {
+    color: #7befb2;
+}
+
+p {
+    color: #ececec;
+}
+
+/* buttons */
+button {
+    background-color: #4183d7;
+    border: 0px solid black;
+    border-radius: 10px;
+    color: white;
+    display: inline-block;
+    font-size: 16px;
+    font-family: Consolas;
+    height: 30px;
+    margin: 10px;
+    text-align: center;
+    text-decoration: none;
+    width: 150px;
+}
+
+button:hover {
+    background-color: #6bb9f0;
+}
+
+.button-green {
+    background-color: #00b16a;
+}
+
+.button-green:hover {
+    background-color: #26c281;
+}
+
+.button-red {
+    background-color: #f03434;
+}
+
+.button-red:hover {
+    background-color: #f22613;
+}
