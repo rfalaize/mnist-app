@@ -129,23 +129,31 @@ class App extends Component {
     render() {
         return (
             <div className="App">
-                <h1>Paint</h1>
-                <button className="button-red" onClick={this.clearCanvas}>
-                    Clear
-                </button>
-                <button className="button-green" onClick={this.predict}>
-                    Predict
-                </button>
-                <canvas
-                    ref={this.canvasRef}
-                    id="digitsCanvas"
-                    width={this.canvasWidth}
-                    height={this.canvasHeigth}
-                    onMouseDown={this.canvasOnMouseDown}
-                    onMouseMove={this.canvasOnMouseMove}
-                    onMouseLeave={this.canvasOnMouseLeave}
-                    onMouseUp={this.canvasOnMouseUp}
-                ></canvas>
+                <div style={{ display: "flex" }}>
+                    <h1>Paint</h1>
+                </div>
+
+                <div style={{ display: "inline-flex" }}>
+                    <canvas
+                        ref={this.canvasRef}
+                        id="digitsCanvas"
+                        width={this.canvasWidth}
+                        height={this.canvasHeigth}
+                        onMouseDown={this.canvasOnMouseDown}
+                        onMouseMove={this.canvasOnMouseMove}
+                        onMouseLeave={this.canvasOnMouseLeave}
+                        onMouseUp={this.canvasOnMouseUp}
+                    ></canvas>
+                </div>
+
+                <div style={{ display: "flex" }}>
+                    <button className="button-red" onClick={this.clearCanvas}>
+                        Clear
+                    </button>
+                    <button className="button-green" onClick={this.predict}>
+                        Predict
+                    </button>
+                </div>
             </div>
         );
     }
