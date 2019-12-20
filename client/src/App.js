@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Chart from "chart.js";
 import "./App.css";
 
 /*
@@ -9,7 +10,6 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.state = {};
-        this.context = null; // canvas context
         this.canvasRef = React.createRef();
         this.canvas = null;
         this.clickX = [];
@@ -19,13 +19,81 @@ class App extends Component {
         // canvas size
         this.canvasWidth = 128;
         this.canvasHeigth = 128;
+        // chart
+        this.chartRef = React.createRef();
+        this.state.chartProbabilities = [];
+        this.state.chartPrediction = -1;
     }
 
     componentDidMount() {
-        this.context = this.canvasRef.current.getContext("2d");
+        // drawing canvas
         this.canvas = this.canvasRef.current;
         this.clearCanvas();
+        // chart canvas
+        this.createChart();
     }
+
+    componentDidUpdate() {
+        this.createChart();
+    }
+
+    createChart = () => {
+        console.log(">>> createChart");
+        const probasChartRef = this.chartRef.current.getContext("2d");
+        const backgroundColors = Array.from({ length: 10 }, () => "#f89406");
+        if (this.state.chartPrediction > 0) {
+            backgroundColors[this.state.chartPrediction] = "#f89406";
+        }
+        new Chart(probasChartRef, {
+            type: "bar",
+            data: {
+                labels: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+                datasets: [
+                    {
+                        backgroundColor: backgroundColors,
+                        data: this.state.chartProbabilities
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    position: "top",
+                    display: false
+                },
+                scales: {
+                    xAxes: [
+                        {
+                            gridLines: {
+                                display: false
+                            },
+                            ticks: {
+                                fontColor: "#fff"
+                            }
+                        }
+                    ],
+                    yAxes: [
+                        {
+                            gridLines: {
+                                display: false
+                            },
+                            ticks: {
+                                fontColor: "#fff",
+                                max: 1,
+                                min: 0,
+                                stepSize: 0.5
+                            }
+                        }
+                    ]
+                },
+                title: {
+                    display: true,
+                    text: "Probabilities",
+                    fontColor: "#fff"
+                }
+            }
+        });
+    };
 
     // canvas events
     canvasOnMouseDown = e => {
@@ -56,7 +124,8 @@ class App extends Component {
     }
 
     redraw() {
-        const { context, clickX, clickY, clickDrag } = this;
+        const context = this.canvasRef.current.getContext("2d");
+        const { clickX, clickY, clickDrag } = this;
         context.clearRect(0, 0, context.canvas.width, context.canvas.height); // clears the canvas
         context.strokeStyle = "#fff";
         context.lineJoin = "round";
@@ -100,16 +169,19 @@ class App extends Component {
 
     // triggers
     clearCanvas = () => {
-        this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
+        const context = this.canvasRef.current.getContext("2d");
+        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         this.clickX = [];
         this.clickY = [];
         this.clickDrag = [];
         this.paint = false;
+        this.setState({ chartProbabilities: [], chartPrediction: -1 });
     };
 
     predict = () => {
         console.log("predict");
-        const { context } = this;
+        const context = this.canvasRef.current.getContext("2d");
+        const appComponent = this;
         const imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height).data;
         const greyScaleImage = this.greyscale([...imageData]);
         // create post request
@@ -118,23 +190,29 @@ class App extends Component {
         xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
-                alert(xhr.responseText);
+                window.rhome = xhr.responseText;
+                const result = JSON.parse(xhr.responseText);
+                console.log("result=", result);
+                appComponent.setState({ chartProbabilities: result.probas, chartPrediction: result.digit });
+                console.log(appComponent.state);
             }
         };
         xhr.send(
             JSON.stringify({ type: "digit-recognition", image: greyScaleImage, canvasWidth: this.canvasWidth, canvasHeigth: this.canvasHeigth })
         );
+        this.clearCanvas();
     };
 
     render() {
         return (
-            <div className="App">
-                <div style={{ display: "flex" }}>
-                    <h1>Paint</h1>
+            <div className="flex-container">
+                <div className="flex-container-item">
+                    <h1>Draw digit</h1>
                 </div>
 
-                <div style={{ display: "inline-flex" }}>
+                <div className="flex-container-item">
                     <canvas
+                        className="drawing-canvas"
                         ref={this.canvasRef}
                         id="digitsCanvas"
                         width={this.canvasWidth}
@@ -146,13 +224,20 @@ class App extends Component {
                     ></canvas>
                 </div>
 
-                <div style={{ display: "flex" }}>
-                    <button className="button-red" onClick={this.clearCanvas}>
+                <div className="flex-container-item">
+                    <button className="button-green" onClick={this.predict}>
+                        Classify
+                    </button>
+                </div>
+
+                <div className="flex-container-item">
+                    <button className="button-blue" onClick={this.clearCanvas}>
                         Clear
                     </button>
-                    <button className="button-green" onClick={this.predict}>
-                        Predict
-                    </button>
+                </div>
+
+                <div className="flex-container-item">
+                    <canvas id="chartCanvas" ref={this.chartRef} />
                 </div>
             </div>
         );

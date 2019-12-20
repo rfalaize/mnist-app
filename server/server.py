@@ -2,7 +2,7 @@
 
 import flask
 from flask_cors import CORS
-from flask import request
+from flask import request, jsonify
 import tensorflow as tf
 from skimage.transform import resize
 import matplotlib.pyplot as plt
@@ -18,7 +18,6 @@ CORS(app)
 app.config["DEBUG"] = True
 
 # load model
-print("*****************************************")
 print("Loading model...")
 model = tf.keras.models.load_model("C:\TEMP\mnist_model.h5")
 print("Model loaded. Starting server...")
@@ -40,10 +39,10 @@ def predict():
         print('Running predictions on image with size', image.shape)
         probabilities = model.predict(image)
         digit = np.argmax(probabilities)
-        result = str({'status': 'ok', 'digit': digit, 'probas': probabilities})
+        result = {'status': 'ok', 'digit': int(digit), 'probas': probabilities[0].tolist()}
     except Exception as e:
-        result = str({'status': 'ko', 'error': str(e)})
+        result = {'status': 'ko', 'error': str(e)}
     print('>>> result:', result)
-    return result
+    return jsonify(result)
 
 app.run()

@@ -1,43 +1,25 @@
-body {
-    background-color: rgb(58, 58, 58);
-    font-family: Consolas;
-}
-
-canvas {
+.drawing-canvas {
     background: black;
-    outline: #34495e 10px solid;
-}
-
-h1 {
-    color: #00e640;
-}
-
-h3 {
-    color: #7befb2;
-}
-
-p {
-    color: #ececec;
+    outline: #a81ba4 10px solid;
+    margin-bottom: 10px;
 }
 
 /* buttons */
 button {
-    background-color: #4183d7;
+    background-color: #2668be;
     border: 0px solid black;
     border-radius: 10px;
     color: white;
-    display: inline-block;
     font-size: 16px;
     font-family: Consolas;
     height: 30px;
-    margin: 10px;
     text-align: center;
     text-decoration: none;
     width: 150px;
 }
 
 button:hover {
-    background-color: #6bb9f0;
+    background-color: #3184c0;
 }
 
 .button-green {
@@ -45,7 +27,7 @@ button:hover {
 }
 
 .button-green:hover {
-    background-color: #26c281;
+    background-color: #2fc988;
 }
 
 .button-red {
@@ -54,4 +36,27 @@ button:hover {
 
 .button-red:hover {
     background-color: #f22613;
+}
+
+/* CSS gradient */
+body {
+    margin: 0;
+    width: 100%;
+    height: 100vh;
+    font-family: "Consolas";
+    color: #fff;
+    background: linear-gradient(90deg, #8a2387, #e94057, #f27121);
+}
+
+.flex-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+.flex-container-item {
+    /* max-width: 80%; */
+    margin: 5px;
 }
