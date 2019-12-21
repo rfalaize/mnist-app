@@ -11,7 +11,7 @@ class App extends Component {
         super(props);
         this.state = {};
         this.canvasRef = React.createRef();
-        this.canvas = null;
+        // this.canvas = null;
         this.clickX = [];
         this.clickY = [];
         this.clickDrag = [];
@@ -26,11 +26,10 @@ class App extends Component {
     }
 
     componentDidMount() {
-        // drawing canvas
-        this.canvas = this.canvasRef.current;
-        this.clearCanvas();
         // chart canvas
         this.createChart();
+        // clear
+        this.clearAll();
     }
 
     componentDidUpdate() {
@@ -38,12 +37,11 @@ class App extends Component {
     }
 
     createChart = () => {
-        console.log(">>> createChart");
         const probasChartRef = this.chartRef.current.getContext("2d");
-        const backgroundColors = Array.from({ length: 10 }, () => "#f89406");
-        if (this.state.chartPrediction > 0) {
-            backgroundColors[this.state.chartPrediction] = "#f89406";
-        }
+        const backgroundColors = Array.from({ length: 10 }, () => "orange");
+        // if (this.state.chartPrediction > 0) {
+        //     backgroundColors[this.state.chartPrediction] = "#f89406";
+        // }
         new Chart(probasChartRef, {
             type: "bar",
             data: {
@@ -87,7 +85,7 @@ class App extends Component {
                     ]
                 },
                 title: {
-                    display: true,
+                    display: false,
                     text: "Probabilities",
                     fontColor: "#fff"
                 }
@@ -98,13 +96,15 @@ class App extends Component {
     // canvas events
     canvasOnMouseDown = e => {
         this.paint = true;
-        this.addClick(e.pageX - this.canvas.offsetLeft, e.pageY - this.canvas.offsetTop);
+        const drawingCanvas = this.canvasRef.current;
+        this.addClick(e.pageX - drawingCanvas.offsetLeft, e.pageY - drawingCanvas.offsetTop);
         this.redraw();
     };
 
     canvasOnMouseMove = e => {
         if (this.paint) {
-            this.addClick(e.pageX - this.canvas.offsetLeft, e.pageY - this.canvas.offsetTop, true);
+            const drawingCanvas = this.canvasRef.current;
+            this.addClick(e.pageX - drawingCanvas.offsetLeft, e.pageY - drawingCanvas.offsetTop, true);
             this.redraw();
         }
     };
@@ -129,7 +129,7 @@ class App extends Component {
         context.clearRect(0, 0, context.canvas.width, context.canvas.height); // clears the canvas
         context.strokeStyle = "#fff";
         context.lineJoin = "round";
-        context.lineWidth = 10;
+        context.lineWidth = 8;
         for (var i = 0; i < clickX.length; i++) {
             context.beginPath();
             if (clickDrag[i] && i) {
@@ -163,11 +163,16 @@ class App extends Component {
             var avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
             greyScaleData.push(avg);
         }
-        console.log("greyScaleData generated", greyScaleData);
         return greyScaleData;
     };
 
     // triggers
+
+    clearAll = () => {
+        this.clearCanvas();
+        this.clearResults();
+    };
+
     clearCanvas = () => {
         const context = this.canvasRef.current.getContext("2d");
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
@@ -175,6 +180,9 @@ class App extends Component {
         this.clickY = [];
         this.clickDrag = [];
         this.paint = false;
+    };
+
+    clearResults = () => {
         this.setState({ chartProbabilities: [], chartPrediction: -1 });
     };
 
@@ -186,21 +194,21 @@ class App extends Component {
         const greyScaleImage = this.greyscale([...imageData]);
         // create post request
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://127.0.0.1:5000/api/v1/mnist/predict", true);
+        xhr.open("POST", "http://127.0.0.1:5000/api/v1/digits/predict", true);
         xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
         xhr.onreadystatechange = function() {
+            appComponent.clearResults();
             if (xhr.readyState === XMLHttpRequest.DONE) {
-                window.rhome = xhr.responseText;
                 const result = JSON.parse(xhr.responseText);
-                console.log("result=", result);
-                appComponent.setState({ chartProbabilities: result.probas, chartPrediction: result.digit });
-                console.log(appComponent.state);
+                window.rhome = result;
+                if (!result.success) {
+                    alert(xhr.responseText);
+                } else {
+                    appComponent.setState({ chartProbabilities: result.probas, chartPrediction: result.digit });
+                }
             }
         };
-        xhr.send(
-            JSON.stringify({ type: "digit-recognition", image: greyScaleImage, canvasWidth: this.canvasWidth, canvasHeigth: this.canvasHeigth })
-        );
-        this.clearCanvas();
+        xhr.send(JSON.stringify({ image: greyScaleImage, imageWidth: this.canvasWidth, imageHeigth: this.canvasHeigth }));
     };
 
     render() {
@@ -231,13 +239,25 @@ class App extends Component {
                 </div>
 
                 <div className="flex-container-item">
-                    <button className="button-blue" onClick={this.clearCanvas}>
+                    <button className="button-blue" onClick={this.clearAll} style={{ marginBottom: "30px" }}>
                         Clear
                     </button>
                 </div>
 
                 <div className="flex-container-item">
-                    <canvas id="chartCanvas" ref={this.chartRef} />
+                    <div className="flip-card">
+                        <div className="flip-card-inner">
+                            <div className="flip-card-front">
+                                <h2>Result</h2>
+                                <p style={{ marginBottom: "25px" }}>Digit recognized:</p>
+                                <span className="predicted-digit">{this.state.chartPrediction > 0 ? this.state.chartPrediction : null}</span>
+                            </div>
+                            <div className="flip-card-back">
+                                <h2>Model Probabilities</h2>
+                                <canvas id="chartCanvas" ref={this.chartRef} height="150" width="400" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         );

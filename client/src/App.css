@@ -1,7 +1,13 @@
 .drawing-canvas {
     background: black;
-    outline: #a81ba4 10px solid;
+    outline: #c01d7c 10px solid;
     margin-bottom: 10px;
+}
+
+.predicted-digit {
+    /* font-family: Oxygen; */
+    font-weight: bolder;
+    font-size: 100px;
 }
 
 /* buttons */
@@ -57,6 +63,48 @@ body {
 }
 
 .flex-container-item {
-    /* max-width: 80%; */
     margin: 5px;
+}
+
+/* Flip card */
+.flip-card {
+    background-color: transparent;
+    width: 600px;
+    height: 300px;
+    perspective: 1000px;
+}
+
+.flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+.flip-card:hover .flip-card-inner {
+    transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+}
+
+.flip-card-front {
+    /* background-color: rgb(91, 209, 97); */
+    background: linear-gradient(90deg, #1d976c, #93f9b9);
+    /* color: black; */
+}
+
+.flip-card-back {
+    /* background-color: #2980b9; */
+    background: linear-gradient(90deg, #ff5f6d, #ffc371);
+    /* color: white; */
+    transform: rotateY(180deg);
 }
