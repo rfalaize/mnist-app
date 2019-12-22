@@ -11,7 +11,6 @@ class App extends Component {
         super(props);
         this.state = {};
         this.canvasRef = React.createRef();
-        // this.canvas = null;
         this.clickX = [];
         this.clickY = [];
         this.clickDrag = [];
@@ -250,7 +249,7 @@ class App extends Component {
                             <div className="flip-card-front">
                                 <h2>Result</h2>
                                 <p style={{ marginBottom: "25px" }}>Digit recognized:</p>
-                                <span className="predicted-digit">{this.state.chartPrediction > 0 ? this.state.chartPrediction : null}</span>
+                                <span className="predicted-digit">{this.state.chartPrediction >= 0 ? this.state.chartPrediction : null}</span>
                             </div>
                             <div className="flip-card-back">
                                 <h2>Model Probabilities</h2>
