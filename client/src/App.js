@@ -199,7 +199,6 @@ class App extends Component {
             appComponent.clearResults();
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 const result = JSON.parse(xhr.responseText);
-                window.rhome = result;
                 if (!result.success) {
                     alert(xhr.responseText);
                 } else {
